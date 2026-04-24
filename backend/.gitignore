@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database
+*.db
+faiss_index/
+chroma_db/
+
+# OS
+.DS_Store
+Thumbs.db

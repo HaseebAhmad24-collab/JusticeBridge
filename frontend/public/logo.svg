@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Center Pillar -->
+  <path d="M12 3v18" stroke="#1e3a8a" stroke-width="2.5" />
+  <!-- Base -->
+  <path d="M8 21h8" stroke="#1e3a8a" stroke-width="2.5" />
+  <!-- Beam -->
+  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" stroke="#1e3a8a" stroke-width="2" />
+  <!-- Left Pan -->
+  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" fill="#fbbf24" stroke="#b45309" />
+  <!-- Right Pan -->
+  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" fill="#fbbf24" stroke="#b45309" />
+</svg>
