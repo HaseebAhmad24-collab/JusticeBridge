@@ -166,7 +166,7 @@ const LegalLibrary = ({ topicKey }) => {
     const fetchDoc = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8000/legal-library/${topicKey}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/legal-library/${topicKey}`);
         if (response.ok) {
           const data = await response.json();
           setDoc(data);
@@ -240,7 +240,7 @@ function App() {
   // Fetch conversations from backend
   const fetchConversations = async (userToken) => {
     try {
-      const response = await fetch('http://localhost:8000/conversations', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/conversations`, {
         headers: { 'Authorization': `Bearer ${userToken}` }
       });
       if (response.ok) {
@@ -355,7 +355,7 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -427,7 +427,7 @@ function App() {
     }
 
     try {
-      const resp = await fetch(`http://localhost:8000/messages/${id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/messages/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -508,7 +508,7 @@ function App() {
   const deleteSession = async (e, id) => {
     e.stopPropagation();
     try {
-      const response = await fetch(`http://localhost:8000/conversations/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/conversations/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -61,13 +61,13 @@ const Auth = ({ onLoginSuccess, onBack }) => {
                 params.append('username', formData.email);
                 params.append('password', formData.password);
 
-                response = await fetch('http://localhost:8000/login', {
+                response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params
                 });
             } else {
-                response = await fetch('http://localhost:8000/register', {
+                response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
