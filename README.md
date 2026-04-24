@@ -1,11 +1,23 @@
-# ⚖️ JusticeBridge AI - Your Legal Assistant for Pakistan Law
+<div align="center">
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
-[![Gemini AI](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google-gemini&logoColor=white)](https://ai.google.dev/)
-[![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+![JusticeBridge-v1.0](https://img.shields.io/badge/JusticeBridge-V1.0-blue?style=flat-square)
 
-**JusticeBridge AI** is an advanced, AI-powered legal consultation platform specifically designed for the legal landscape of Pakistan. It leverages **Retrieval-Augmented Generation (RAG)** to provide highly accurate, citation-backed answers from the Pakistan Penal Code, Constitution, and Religious Jurisprudence.
+# JusticeBridge AI
+
+*Empowering Pakistan with Context-Aware Legal Intelligence.*
+
+**An AI-powered legal platform that leverages RAG (Retrieval-Augmented Generation) to provide accurate, citation-backed answers for Pakistan Penal Code, Constitution, and Religious Jurisprudence.**
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-v0.100.0-005571?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-v18.0-20232A?style=flat-square&logo=react)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-v5.0-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![GeminiAI](https://img.shields.io/badge/Google_Gemini-AI-8E75B2?style=flat-square&logo=google-gemini)](https://ai.google.dev/)
+[![SQLite](https://img.shields.io/badge/SQLite-v3.0-07405E?style=flat-square&logo=sqlite)](https://sqlite.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
+
+[Live Demo](https://justicebridge.vercel.app) · [Report Bug](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues) · [Request Feature](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues)
+
+</div>
 
 ---
 
@@ -13,7 +25,6 @@
 
 Access to legal aid is often expensive and slow. **JusticeBridge AI** bridges this gap by:
 - **Democratizing Legal Knowledge**: Providing instant access to complex legal documents in simple Roman Urdu or English.
-- **Reducing Legal Complexity**: Breaking down legal jargon into actionable advice.
 - **Accuracy First**: Unlike generic AI, our RAG system cross-references real legal documents before answering.
 - **Empowering Professionals**: Assisting law students and researchers with quick references and case summaries.
 
@@ -103,4 +114,6 @@ graph TD
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Built with ❤️ for a more accessible legal system in Pakistan.*
+<div align="center">
+Built with ❤️ for a more accessible legal system in Pakistan.
+</div>
