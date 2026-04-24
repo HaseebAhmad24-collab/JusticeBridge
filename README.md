@@ -33,15 +33,15 @@ Access to legal aid is often expensive and slow. **JusticeBridge AI** bridges th
 
 ```mermaid
 graph TD
-    User((User)) -->|Queries| Frontend[React App]
-    Frontend -->|JWT Auth| API[FastAPI Backend]
-    API -->|Search Query| RAG[RAG Engine]
-    RAG -->|Semantic Lookup| VectorDB[(FAISS Vector Store)]
-    VectorDB -->|Context| API
-    API -->|Prompt + Context| Gemini[Google Gemini AI]
-    Gemini -->|AI Response| API
-    API -->|JSON Response| Frontend
-    API -->|Save Message| DB[(SQLite DB)]
+    A["User"] -->|Queries| B["Frontend (React)"]
+    B -->|JWT Auth| C["Backend (FastAPI)"]
+    C -->|Search Query| D["RAG Engine"]
+    D -->|Semantic Lookup| E[("FAISS Vector Store")]
+    E -->|Context| C
+    C -->|Prompt + Context| F["Google Gemini AI"]
+    F -->|AI Response| C
+    C -->|JSON Response| B
+    C -->|Save Message| G[("SQLite DB")]
 ```
 
 ---
