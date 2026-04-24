@@ -15,7 +15,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-v3.0-07405E?style=flat-square&logo=sqlite)](https://sqlite.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 
-[Live Demo](https://justicebridge.vercel.app) · [Report Bug](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues) · [Request Feature](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues)
+[Live Demo](https://justice-bridge.vercel.app) · [Report Bug](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues) · [Request Feature](https://github.com/HaseebAhmad24-collab/JusticeBridge/issues)
 
 </div>
 
