@@ -12,13 +12,14 @@ import {
     Trophy,
     History,
     Menu,
-    X
+    X,
+    Download
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import './Home.css';
 
-const Home = ({ onStartChat, onLogin, onTopicClick }) => {
+const Home = ({ onStartChat, onLogin, onTopicClick, showInstallBtn, onInstall }) => {
     const [email, setEmail] = useState('');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -110,6 +111,16 @@ const Home = ({ onStartChat, onLogin, onTopicClick }) => {
                     <motion.a whileHover={hoverLift} whileTap={tapCompress} href="#about" onClick={() => setMobileMenuOpen(false)}>About</motion.a>
                     <motion.a whileHover={hoverLift} whileTap={tapCompress} href="#insights" onClick={() => setMobileMenuOpen(false)}>Insights</motion.a>
                     <motion.a whileHover={hoverLift} whileTap={tapCompress} href="#articles" onClick={() => setMobileMenuOpen(false)}>Articles</motion.a>
+                    {showInstallBtn && (
+                        <motion.button 
+                            whileHover={hoverScale} 
+                            whileTap={tapCompress} 
+                            className="nav-download-btn" 
+                            onClick={() => { onInstall(); setMobileMenuOpen(false); }}
+                        >
+                            <Download size={16} /> Download App
+                        </motion.button>
+                    )}
                     <motion.button whileHover={hoverScale} whileTap={tapCompress} className="nav-login-btn" onClick={() => { onLogin(); setMobileMenuOpen(false); }}>Login</motion.button>
                     <motion.button whileHover={hoverScale} whileTap={tapCompress} className="nav-cta-btn" onClick={() => { onStartChat(); setMobileMenuOpen(false); }}>Start Consultation</motion.button>
                 </motion.nav>
@@ -146,6 +157,16 @@ const Home = ({ onStartChat, onLogin, onTopicClick }) => {
                         >
                             Try Trial Account
                         </motion.button>
+                        {showInstallBtn && (
+                            <motion.button 
+                                whileHover={hoverScale} 
+                                whileTap={tapCompress}
+                                className="hero-download-btn" 
+                                onClick={onInstall}
+                            >
+                                <Download size={18} /> Download App
+                            </motion.button>
+                        )}
                     </motion.div>
                 </motion.div>
                 <motion.div 

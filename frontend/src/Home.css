@@ -501,7 +501,8 @@
     }
 
     .home-nav .nav-login-btn,
-    .home-nav .nav-cta-btn {
+    .home-nav .nav-cta-btn,
+    .home-nav .nav-download-btn {
         width: 100%;
         padding: 14px;
         text-align: center;
@@ -569,4 +570,50 @@
     .section-title h2 {
         font-size: 2rem;
     }
+}
+
+/* PWA Download Buttons Styling */
+.nav-download-btn {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.nav-download-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: white;
+}
+
+.hero-download-btn {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+    padding: 15px 35px;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: var(--transition);
+}
+
+.hero-download-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.45);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15);
 }

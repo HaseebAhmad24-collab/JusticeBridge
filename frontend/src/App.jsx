@@ -32,7 +32,8 @@ import {
   XCircle,
   UserPlus,
   Coins,
-  Home as HomeIcon
+  Home as HomeIcon,
+  Download
 } from 'lucide-react';
 
 import Profile from './Profile';
@@ -212,6 +213,59 @@ const LegalLibrary = ({ topicKey }) => {
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIOSTip, setShowIOSTip] = useState(false);
+
+  useEffect(() => {
+    // 1. Detect if running standalone mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+    // 2. Detect iOS Safari
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIpad = userAgent.includes('ipad') || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && userAgent.includes('macintosh'));
+    const isIPhone = userAgent.includes('iphone') || userAgent.includes('ipod');
+    const isIOSDevice = isIpad || isIPhone;
+    const isSafari = userAgent.includes('safari') && !userAgent.includes('chrome') && !userAgent.includes('android');
+    const isIOSReady = isIOSDevice && isSafari && !isStandalone;
+
+    setIsIOS(isIOSReady);
+
+    if (isIOSReady) {
+      setShowInstallBtn(true);
+    }
+
+    // 3. Listen for beforeinstallprompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      if (!isStandalone) {
+        setShowInstallBtn(true);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (isIOS) {
+      setShowIOSTip(true);
+      return;
+    }
+
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`PWA install user outcome: ${outcome}`);
+    setDeferredPrompt(null);
+    setShowInstallBtn(false);
+  };
   const [activeView, setActiveView] = useState(() => localStorage.getItem('activeView') || 'landing');
   const [showAuth, setShowAuth] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -602,12 +656,43 @@ function App() {
           onStartChat={handleStartChat}
           onLogin={() => setShowAuth(true)}
           onTopicClick={handleTopicClick}
+          showInstallBtn={showInstallBtn}
+          onInstall={handleInstallClick}
         />
         {showAuth && (
           <Auth
             onLoginSuccess={handleLoginSuccess}
             onBack={() => setShowAuth(false)}
           />
+        )}
+        {showIOSTip && (
+          <div className="ios-prompt-overlay" onClick={() => setShowIOSTip(false)}>
+            <div className="ios-prompt-card glass-card" onClick={(e) => e.stopPropagation()}>
+              <button className="close-ios-prompt" onClick={() => setShowIOSTip(false)}>
+                <X size={20} />
+              </button>
+              <div className="ios-prompt-header">
+                <Scale size={40} className="ios-prompt-logo" />
+                <h3>Install JusticeBridge AI</h3>
+                <p>Add JusticeBridge to your home screen for quick, offline-capable access like a native app.</p>
+              </div>
+              <div className="ios-prompt-steps">
+                <div className="ios-step">
+                  <span className="step-num">1</span>
+                  <span className="step-text">Tap the <strong>Share</strong> button at the bottom of Safari (<span className="ios-share-icon">⎙</span> or similar).</span>
+                </div>
+                <div className="ios-step">
+                  <span className="step-num">2</span>
+                  <span className="step-text">Scroll down the menu and select <strong>Add to Home Screen</strong> (<span className="ios-add-icon">+</span>).</span>
+                </div>
+                <div className="ios-step">
+                  <span className="step-num">3</span>
+                  <span className="step-text">Tap <strong>Add</strong> in the top-right corner to complete installation.</span>
+                </div>
+              </div>
+              <button className="ios-prompt-btn" onClick={() => setShowIOSTip(false)}>Got It</button>
+            </div>
+          </div>
         )}
       </>
     );
@@ -808,6 +893,19 @@ function App() {
         </nav>
 
         <div className="sidebar-footer" style={{ padding: '20px', borderTop: '1px solid var(--glass-border)' }}>
+          {showInstallBtn && (
+            <motion.div
+              className="nav-item nav-download-item"
+              onClick={handleInstallClick}
+              style={{ color: 'var(--legal-blue)', marginBottom: '10px' }}
+              whileHover={{ x: 3 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+            >
+              <Download size={20} />
+              <span>Download App</span>
+            </motion.div>
+          )}
           <motion.div
             className="nav-item"
             onClick={handleLogout}
@@ -841,6 +939,18 @@ function App() {
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            {showInstallBtn && (
+              <motion.button
+                className="header-download-btn"
+                onClick={handleInstallClick}
+                title="Download App"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Download size={18} />
+                <span className="btn-text">Download App</span>
+              </motion.button>
+            )}
             {activeView === 'chat' && (
               <button
                 className={`insights-toggle ${!insightsOpen ? 'inactive' : ''}`}
@@ -999,6 +1109,36 @@ function App() {
             if (window.innerWidth <= 1200) setInsightsOpen(false);
           }}
         ></div>
+      )}
+      {/* iOS Safari PWA Installation Instructions Tooltip Modal */}
+      {showIOSTip && (
+        <div className="ios-prompt-overlay" onClick={() => setShowIOSTip(false)}>
+          <div className="ios-prompt-card glass-card" onClick={(e) => e.stopPropagation()}>
+            <button className="close-ios-prompt" onClick={() => setShowIOSTip(false)}>
+              <X size={20} />
+            </button>
+            <div className="ios-prompt-header">
+              <Scale size={40} className="ios-prompt-logo" />
+              <h3>Install JusticeBridge AI</h3>
+              <p>Add JusticeBridge to your home screen for quick, offline-capable access like a native app.</p>
+            </div>
+            <div className="ios-prompt-steps">
+              <div className="ios-step">
+                <span className="step-num">1</span>
+                <span className="step-text">Tap the <strong>Share</strong> button at the bottom of Safari (<span className="ios-share-icon">⎙</span> or similar).</span>
+              </div>
+              <div className="ios-step">
+                <span className="step-num">2</span>
+                <span className="step-text">Scroll down the menu and select <strong>Add to Home Screen</strong> (<span className="ios-add-icon">+</span>).</span>
+              </div>
+              <div className="ios-step">
+                <span className="step-num">3</span>
+                <span className="step-text">Tap <strong>Add</strong> in the top-right corner to complete installation.</span>
+              </div>
+            </div>
+            <button className="ios-prompt-btn" onClick={() => setShowIOSTip(false)}>Got It</button>
+          </div>
+        </div>
       )}
     </div >
   );

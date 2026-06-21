@@ -884,3 +884,187 @@
     line-height: 1.7;
   }
 }
+
+/* PWA App-header Download Button */
+.header-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.header-download-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #ffffff;
+}
+
+/* Sidebar PWA menu download styling adjustments */
+.nav-download-item {
+  color: var(--legal-blue) !important;
+  font-weight: 600;
+}
+
+.nav-download-item:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* iOS Safari PWA Install Overlay */
+.ios-prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 6, 23, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.ios-prompt-card {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  padding: 30px;
+  background: rgba(2, 6, 23, 0.9);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  backdrop-filter: blur(20px);
+}
+
+.close-ios-prompt {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-ios-prompt:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.ios-prompt-header {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ios-prompt-logo {
+  color: var(--legal-blue);
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+}
+
+.ios-prompt-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+}
+
+.ios-prompt-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.ios-prompt-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.ios-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+}
+
+.step-num {
+  width: 26px;
+  height: 26px;
+  background: var(--legal-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #e2e8f0;
+}
+
+.ios-share-icon, .ios-add-icon {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.ios-prompt-btn {
+  width: 100%;
+  background: var(--accent-gradient);
+  border: none;
+  color: white;
+  padding: 14px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+.ios-prompt-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Responsiveness for app header download button text */
+@media (max-width: 640px) {
+  .header-download-btn {
+    padding: 10px;
+    border-radius: 50%;
+  }
+  .header-download-btn .btn-text {
+    display: none;
+  }
+}
