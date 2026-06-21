@@ -10,13 +10,16 @@ import {
     Users,
     Compass,
     Trophy,
-    History
+    History,
+    Menu,
+    X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './Home.css';
 
 const Home = ({ onStartChat, onLogin, onTopicClick }) => {
     const [email, setEmail] = useState('');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleNewsletterSubmit = (e) => {
         e.preventDefault();
@@ -35,12 +38,21 @@ const Home = ({ onStartChat, onLogin, onTopicClick }) => {
                     <Scale size={32} className="logo-icon" />
                     <span>JusticeBridge</span>
                 </div>
-                <nav className="home-nav">
-                    <a href="#about">About</a>
-                    <a href="#insights">Insights</a>
-                    <a href="#articles">Articles</a>
-                    <button className="nav-login-btn" onClick={onLogin}>Login</button>
-                    <button className="nav-cta-btn" onClick={onStartChat}>Start Consultation</button>
+                
+                <button 
+                    className={`mobile-menu-toggle ${mobileMenuOpen ? 'open' : ''}`}
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+                </button>
+
+                <nav className={`home-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+                    <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
+                    <a href="#insights" onClick={() => setMobileMenuOpen(false)}>Insights</a>
+                    <a href="#articles" onClick={() => setMobileMenuOpen(false)}>Articles</a>
+                    <button className="nav-login-btn" onClick={() => { onLogin(); setMobileMenuOpen(false); }}>Login</button>
+                    <button className="nav-cta-btn" onClick={() => { onStartChat(); setMobileMenuOpen(false); }}>Start Consultation</button>
                 </nav>
             </header>
 

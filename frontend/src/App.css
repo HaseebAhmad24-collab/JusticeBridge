@@ -2,6 +2,7 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   padding: 20px;
   gap: 20px;
   background: transparent;
@@ -435,6 +436,8 @@
   line-height: 1.6;
   position: relative;
   animation: fadeIn 0.4s ease-out forwards;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .message.system {
@@ -718,9 +721,13 @@
 
   .mic-btn,
   .send-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
+  }
+
+  .message-actions button {
+    padding: 8px 10px;
   }
 
   .overlay {
