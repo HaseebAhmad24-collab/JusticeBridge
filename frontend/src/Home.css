@@ -9,11 +9,11 @@
 
 /* Home Header */
 .home-header {
-    height: 80px;
+    height: calc(80px + env(safe-area-inset-top, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5%;
+    padding: env(safe-area-inset-top, 0px) 5% 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -362,7 +362,7 @@
 
 /* Footer */
 .main-footer {
-    padding: 80px 5% 40px;
+    padding: 80px 5% calc(40px + env(safe-area-inset-bottom, 0px));
     background: rgba(0, 0, 0, 0.3);
     border-top: 1px solid var(--glass-border);
 }
@@ -466,7 +466,7 @@
 
     .home-nav {
         position: absolute;
-        top: 80px;
+        top: calc(80px + env(safe-area-inset-top, 0px));
         left: 0;
         right: 0;
         background: rgba(2, 6, 23, 0.96);

@@ -7,7 +7,10 @@
     background: rgba(2, 6, 23, 0.7);
     backdrop-filter: blur(10px);
     z-index: 1000;
-    padding: 20px;
+    padding: calc(20px + env(safe-area-inset-top, 0px))
+             calc(20px + env(safe-area-inset-right, 0px))
+             calc(20px + env(safe-area-inset-bottom, 0px))
+             calc(20px + env(safe-area-inset-left, 0px));
 }
 
 .auth-card {
