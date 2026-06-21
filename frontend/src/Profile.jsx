@@ -9,6 +9,7 @@ import {
     ChevronRight,
     ExternalLink
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import './Profile.css';
 
 const Profile = ({ user, conversations = [], onLogout }) => {
@@ -36,18 +37,37 @@ const Profile = ({ user, conversations = [], onLogout }) => {
     };
 
     return (
-        <div className="profile-container animate-fade-in">
-            <div className="profile-header">
+        <motion.div
+            className="profile-container"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+        >
+            <motion.div
+                className="profile-header"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.05, ease: 'easeOut' }}
+            >
                 <div className="profile-avatar-large">{getInitials(profileData.name)}</div>
                 <div className="profile-info">
                     <h1>{profileData.name}</h1>
                     <p>{profileData.role}</p>
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="profile-grid">
+            <motion.div
+                className="profile-grid"
+                initial="hidden"
+                animate="visible"
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+            >
                 {/* Account Details */}
-                <div className="glass-card profile-card">
+                <motion.div
+                    className="glass-card profile-card"
+                    variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } } }}
+                    whileHover={{ y: -4, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                >
                     <div className="card-header">
                         <User size={18} />
                         <h3>Account Details</h3>
@@ -61,13 +81,20 @@ const Profile = ({ user, conversations = [], onLogout }) => {
                             <div className="info-label">Member Since</div>
                             <div className="info-value">{profileData.joined}</div>
                         </div>
-
-                        <button className="edit-btn">Edit Profile</button>
+                        <motion.button
+                            className="edit-btn"
+                            whileHover={{ scale: 1.02, y: -1 }}
+                            whileTap={{ scale: 0.98 }}
+                        >Edit Profile</motion.button>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Activity & Stats */}
-                <div className="glass-card profile-card">
+                <motion.div
+                    className="glass-card profile-card"
+                    variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } } }}
+                    whileHover={{ y: -4, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                >
                     <div className="card-header">
                         <Clock size={18} />
                         <h3>Recent Activity</h3>
@@ -86,42 +113,45 @@ const Profile = ({ user, conversations = [], onLogout }) => {
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Quick Actions */}
-                <div className="glass-card profile-card full-width">
+                <motion.div
+                    className="glass-card profile-card full-width"
+                    variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } } }}
+                >
                     <div className="card-header">
                         <Settings size={18} />
-                        <h3>Settings & Security</h3>
+                        <h3>Settings &amp; Security</h3>
                     </div>
                     <div className="actions-grid">
-                        <div className="action-tile">
+                        <motion.div className="action-tile" whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
                             <Shield className="action-icon" />
                             <div className="action-text">
                                 <h4>Privacy Policy</h4>
                                 <p>Manage your data</p>
                             </div>
                             <ChevronRight className="arrow" />
-                        </div>
-                        <div className="action-tile">
+                        </motion.div>
+                        <motion.div className="action-tile" whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
                             <ExternalLink className="action-icon" />
                             <div className="action-text">
                                 <h4>Legal Resources</h4>
                                 <p>External law links</p>
                             </div>
                             <ChevronRight className="arrow" />
-                        </div>
-                        <div className="action-tile logout" onClick={onLogout}>
+                        </motion.div>
+                        <motion.div className="action-tile logout" onClick={onLogout} whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
                             <LogOut className="action-icon" />
                             <div className="action-text">
                                 <h4>Logout</h4>
                                 <p>End your session</p>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </motion.div>
+            </motion.div>
+        </motion.div>
     );
 };
 
