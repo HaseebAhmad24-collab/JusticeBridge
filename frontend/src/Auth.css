@@ -7,7 +7,10 @@
     background: rgba(2, 6, 23, 0.7);
     backdrop-filter: blur(10px);
     z-index: 1000;
-    padding: 20px;
+    padding: calc(20px + env(safe-area-inset-top, 0px))
+             calc(20px + env(safe-area-inset-right, 0px))
+             calc(20px + env(safe-area-inset-bottom, 0px))
+             calc(20px + env(safe-area-inset-left, 0px));
 }
 
 .auth-card {
@@ -231,4 +234,18 @@
 
 .auth-footer span:hover {
     text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+    .social-btn {
+        padding: 12px 20px;
+        flex: 1;
+        justify-content: center;
+    }
 }

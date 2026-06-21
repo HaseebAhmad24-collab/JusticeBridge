@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   MessageSquare,
   Scale,
@@ -137,22 +138,26 @@ const ChatInput = ({ onSend, loading, activeSessionId }) => {
           disabled={loading}
         ></textarea>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
           className={`mic-btn ${isListening ? 'listening' : ''}`}
           onClick={handleVoiceInput}
           title="Speak (Roman Urdu/English)"
           disabled={loading}
         >
           {isListening ? <MicOff size={20} className="animate-pulse text-red-500" /> : <Mic size={20} />}
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
           className="send-btn"
           onClick={handleSubmit}
           disabled={!input.trim() || loading}
         >
           {loading ? <Clock size={20} className="animate-spin" /> : <Send size={20} />}
-        </button>
+        </motion.button>
       </div>
     </div>
   );
@@ -184,7 +189,12 @@ const LegalLibrary = ({ topicKey }) => {
   if (!doc) return <div className="library-error">Document not found.</div>;
 
   return (
-    <div className="legal-library-view">
+    <motion.div
+      className="legal-library-view"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+    >
       <div className="document-container">
         <div className="document-header">
           <h1>{doc.title}</h1>
@@ -196,7 +206,7 @@ const LegalLibrary = ({ topicKey }) => {
           </ReactMarkdown>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -621,130 +631,194 @@ function App() {
         </div>
 
         <nav className="sidebar-nav">
-          <div
-            className={`nav-item ${activeView === 'landing' ? 'active' : ''}`}
-            onClick={() => { setActiveView('landing'); setSidebarOpen(false); }}
-          >
-            <HomeIcon size={20} />
-            <span>Home</span>
-          </div>
+          {[
+            { view: 'landing', icon: <HomeIcon size={20} />, label: 'Home' },
+            { view: 'chat', icon: <MessageSquare size={20} />, label: 'Legal Chat' },
+            { view: 'profile', icon: <User size={20} />, label: 'Profile' },
+          ].map(({ view, icon, label }) => (
+            <motion.div
+              key={view}
+              className={`nav-item ${activeView === view ? 'active' : ''}`}
+              onClick={() => { setActiveView(view); setSidebarOpen(false); }}
+              whileHover={{ x: 3 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+            >
+              {icon}
+              <span>{label}</span>
+            </motion.div>
+          ))}
 
-          <div
-            className={`nav-item ${activeView === 'chat' ? 'active' : ''}`}
-            onClick={() => { setActiveView('chat'); setSidebarOpen(false); }}
-          >
-            <MessageSquare size={20} />
-            <span>Legal Chat</span>
-          </div>
-
-          <div
-            className={`nav-item ${activeView === 'profile' ? 'active' : ''}`}
-            onClick={() => { setActiveView('profile'); setSidebarOpen(false); }}
-          >
-            <User size={20} />
-            <span>Profile</span>
-          </div>
-
+          {/* Recent Chats */}
           <div className="nav-section">
-            <div className="nav-section-header" onClick={() => toggleSection('recent')}>
+            <motion.div
+              className="nav-section-header"
+              onClick={() => toggleSection('recent')}
+              whileHover={{ x: 2 }}
+              transition={{ duration: 0.15 }}
+            >
               <span>Recent Chats</span>
-              {expandedSections.recent ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </div>
-            {expandedSections.recent && (
-              <div className="nav-section-content">
-                <div className="nav-item new-chat-btn" onClick={createNewChat}>
-                  <span>+ New Chat</span>
-                </div>
-                <div className="sessions-list">
-                  {conversations.map(conv => (
-                    <div
-                      key={conv.id}
-                      className={`session-item ${activeSessionId === conv.id ? 'active' : ''}`}
-                      onClick={() => { setActiveSessionId(conv.id); setActiveView('chat'); setSidebarOpen(false); }}
-                    >
-                      <span className="session-title">{conv.title}</span>
-                      <button className="session-delete" onClick={(e) => deleteSession(e, conv.id)}>
-                        <X size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              <motion.span
+                animate={{ rotate: expandedSections.recent ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight size={14} />
+              </motion.span>
+            </motion.div>
+            <AnimatePresence initial={false}>
+              {expandedSections.recent && (
+                <motion.div
+                  className="nav-section-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <motion.div
+                    className="nav-item new-chat-btn"
+                    onClick={createNewChat}
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <span>+ New Chat</span>
+                  </motion.div>
+                  <div className="sessions-list">
+                    {conversations.map(conv => (
+                      <motion.div
+                        key={conv.id}
+                        className={`session-item ${activeSessionId === conv.id ? 'active' : ''}`}
+                        onClick={() => { setActiveSessionId(conv.id); setActiveView('chat'); setSidebarOpen(false); }}
+                        whileHover={{ x: 3 }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        <span className="session-title">{conv.title}</span>
+                        <button className="session-delete" onClick={(e) => deleteSession(e, conv.id)}>
+                          <X size={12} />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
+          {/* Laws of Pakistan */}
           <div className="nav-section">
-            <div className="nav-section-header" onClick={() => toggleSection('laws')}>
+            <motion.div
+              className="nav-section-header"
+              onClick={() => toggleSection('laws')}
+              whileHover={{ x: 2 }}
+              transition={{ duration: 0.15 }}
+            >
               <span>Laws of Pakistan</span>
-              {expandedSections.laws ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </div>
-            {expandedSections.laws && (
-              <div className="nav-section-content">
-                <div className="nav-item" onClick={() => handleTopicClick("ppc")}>
-                  <Scale size={18} />
-                  <span>PPC 1860</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("constitution")}>
-                  <ShieldCheck size={18} />
-                  <span>Constitution 1973</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("crpc")}>
-                  <Book size={18} />
-                  <span>CrPC 1898</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("cpc")}>
-                  <FileText size={18} />
-                  <span>CPC 1908</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("family-courts")}>
-                  <Users size={18} />
-                  <span>Family Courts Act</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("evidence")}>
-                  <Gavel size={18} />
-                  <span>Evidence Act</span>
-                </div>
-              </div>
-            )}
+              <motion.span
+                animate={{ rotate: expandedSections.laws ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight size={14} />
+              </motion.span>
+            </motion.div>
+            <AnimatePresence initial={false}>
+              {expandedSections.laws && (
+                <motion.div
+                  className="nav-section-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  {[
+                    { key: 'ppc', icon: <Scale size={18} />, label: 'PPC 1860' },
+                    { key: 'constitution', icon: <ShieldCheck size={18} />, label: 'Constitution 1973' },
+                    { key: 'crpc', icon: <Book size={18} />, label: 'CrPC 1898' },
+                    { key: 'cpc', icon: <FileText size={18} />, label: 'CPC 1908' },
+                    { key: 'family-courts', icon: <Users size={18} />, label: 'Family Courts Act' },
+                    { key: 'evidence', icon: <Gavel size={18} />, label: 'Evidence Act' },
+                  ].map(({ key, icon, label }) => (
+                    <motion.div
+                      key={key}
+                      className="nav-item"
+                      onClick={() => handleTopicClick(key)}
+                      whileHover={{ x: 3 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {icon}
+                      <span>{label}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
+          {/* Religious Law */}
           <div className="nav-section">
-            <div className="nav-section-header" onClick={() => toggleSection('religious')}>
+            <motion.div
+              className="nav-section-header"
+              onClick={() => toggleSection('religious')}
+              whileHover={{ x: 2 }}
+              transition={{ duration: 0.15 }}
+            >
               <span>Religious Law</span>
-              {expandedSections.religious ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </div>
-            {expandedSections.religious && (
-              <div className="nav-section-content">
-                <div className="nav-item" onClick={() => handleTopicClick("inheritance")}>
-                  <Hash size={18} />
-                  <span>Inheritance</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("nikah-talaq")}>
-                  <Heart size={18} />
-                  <span>Marriage/Nikah</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("nikah-talaq")}>
-                  <XCircle size={18} />
-                  <span>Divorce/Talaq</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("custody")}>
-                  <UserPlus size={18} />
-                  <span>Child Custody</span>
-                </div>
-                <div className="nav-item" onClick={() => handleTopicClick("zakat")}>
-                  <Coins size={18} />
-                  <span>Zakat & Charity</span>
-                </div>
-              </div>
-            )}
+              <motion.span
+                animate={{ rotate: expandedSections.religious ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight size={14} />
+              </motion.span>
+            </motion.div>
+            <AnimatePresence initial={false}>
+              {expandedSections.religious && (
+                <motion.div
+                  className="nav-section-content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  {[
+                    { key: 'inheritance', icon: <Hash size={18} />, label: 'Inheritance' },
+                    { key: 'nikah-talaq', icon: <Heart size={18} />, label: 'Marriage/Nikah' },
+                    { key: 'nikah-talaq2', icon: <XCircle size={18} />, label: 'Divorce/Talaq', topic: 'nikah-talaq' },
+                    { key: 'custody', icon: <UserPlus size={18} />, label: 'Child Custody' },
+                    { key: 'zakat', icon: <Coins size={18} />, label: 'Zakat & Charity' },
+                  ].map(({ key, icon, label, topic }) => (
+                    <motion.div
+                      key={key}
+                      className="nav-item"
+                      onClick={() => handleTopicClick(topic || key)}
+                      whileHover={{ x: 3 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {icon}
+                      <span>{label}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </nav>
 
         <div className="sidebar-footer" style={{ padding: '20px', borderTop: '1px solid var(--glass-border)' }}>
-          <div className="nav-item" onClick={handleLogout} style={{ color: '#ff4b4b' }}>
+          <motion.div
+            className="nav-item"
+            onClick={handleLogout}
+            style={{ color: '#ff4b4b' }}
+            whileHover={{ x: 3 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+          >
             <LogOut size={20} />
             <span>Logout</span>
-          </div>
+          </motion.div>
         </div>
 
         {sidebarOpen && (
@@ -787,8 +861,16 @@ function App() {
             <div className="chat-main-layout">
               <div className="chat-scroll-area">
                 <div className="chat-messages">
+                  <AnimatePresence initial={false}>
                   {messages.map((msg) => (
-                    <div key={msg.id} className={`message ${msg.type} ${editingId === msg.id ? 'editing' : ''}`}>
+                    <motion.div
+                      key={msg.id}
+                      className={`message ${msg.type} ${editingId === msg.id ? 'editing' : ''}`}
+                      initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                    >
                       <div className="message-content">
                         {msg.type === 'system' && <ShieldCheck size={16} style={{ marginBottom: '5px' }} />}
 
@@ -838,12 +920,31 @@ function App() {
                           <button onClick={() => handleDelete(msg.id)} title="Delete"><Trash2 size={14} /></button>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
+                  </AnimatePresence>
                   {loading && (
-                    <div className="message ai" style={{ fontStyle: 'italic', opacity: 0.7 }}>
-                      <div className="message-content">AI is thinking...</div>
-                    </div>
+                    <motion.div
+                      className="message ai"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="message-content typing-indicator">
+                        <span>AI is thinking</span>
+                        <span className="typing-dots">
+                          {[0, 1, 2].map(i => (
+                            <motion.span
+                              key={i}
+                              className="typing-dot"
+                              animate={{ y: [0, -5, 0] }}
+                              transition={{ duration: 0.55, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+                            />
+                          ))}
+                        </span>
+                      </div>
+                    </motion.div>
                   )}
                 </div>
 

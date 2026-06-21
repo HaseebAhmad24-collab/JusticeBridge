@@ -2,12 +2,39 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   padding: 20px;
   gap: 20px;
   background: transparent;
   overflow: hidden;
   /* Prevent overall page scroll */
 }
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 2px;
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--legal-blue, #4f8ef7);
+  opacity: 0.85;
+}
+
 
 
 /* Glass Sidebar */
@@ -32,7 +59,7 @@
 
 
 .sidebar-header {
-  padding: 30px;
+  padding: calc(30px + env(safe-area-inset-top, 0px)) 30px 30px;
   text-align: center;
 }
 
@@ -266,8 +293,8 @@
   .insights-sidebar {
     position: fixed;
     right: 0;
-    top: calc(var(--header-height) + 20px);
-    bottom: 20px;
+    top: calc(var(--header-height) + env(safe-area-inset-top, 0px) + 20px);
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     height: auto;
     background: var(--bg-deep);
     backdrop-filter: blur(20px);
@@ -286,12 +313,12 @@
 
 
 .app-header {
-  height: var(--header-height);
+  height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
+  padding: env(safe-area-inset-top, 0px) 30px 0;
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -435,6 +462,8 @@
   line-height: 1.6;
   position: relative;
   animation: fadeIn 0.4s ease-out forwards;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .message.system {
@@ -515,8 +544,7 @@
 }
 
 .chat-input-area {
-  padding: 30px;
-  padding-top: 10px;
+  padding: 10px 30px calc(30px + env(safe-area-inset-bottom, 0px));
   flex-shrink: 0;
 }
 
@@ -650,7 +678,7 @@
   }
 
   .app-header {
-    padding: 0 20px;
+    padding: env(safe-area-inset-top, 0px) 20px 0;
   }
 }
 
@@ -663,6 +691,8 @@
     width: 280px;
     max-width: 85%;
     z-index: 1000;
+    /* sidebar-header already accounts for top safe area via padding */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .sidebar.open {
@@ -703,7 +733,7 @@
   }
 
   .chat-input-area {
-    padding: 15px;
+    padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px));
   }
 
   .input-wrapper {
@@ -718,9 +748,13 @@
 
   .mic-btn,
   .send-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
+  }
+
+  .message-actions button {
+    padding: 8px 10px;
   }
 
   .overlay {

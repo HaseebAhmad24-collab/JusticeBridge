@@ -12,6 +12,7 @@ import {
     EyeOff,
     Briefcase
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import './Auth.css';
 
@@ -48,19 +49,14 @@ const Auth = ({ onLoginSuccess, onBack }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!validateForm()) return;
-
         setLoading(true);
-
         try {
             let response;
             if (isLogin) {
-                // OAuth2PasswordRequestForm expects form-data
                 const params = new URLSearchParams();
                 params.append('username', formData.email);
                 params.append('password', formData.password);
-
                 response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -73,28 +69,17 @@ const Auth = ({ onLoginSuccess, onBack }) => {
                     body: JSON.stringify(formData)
                 });
             }
-
             const data = await response.json();
-
             if (!response.ok) {
-                // User-friendly error messages
-                if (response.status === 401) {
-                    throw new Error("Incorrect email or password. Please try again.");
-                } else if (response.status === 404) {
-                    // Handling potential 404 if we add check for user existence
-                    throw new Error("Account not found. Please register first.");
-                } else if (data.detail === "Email already registered") {
-                    throw new Error("This email is already registered. Please login instead.");
-                }
+                if (response.status === 401) throw new Error("Incorrect email or password. Please try again.");
+                else if (response.status === 404) throw new Error("Account not found. Please register first.");
+                else if (data.detail === "Email already registered") throw new Error("This email is already registered. Please login instead.");
                 throw new Error(data.detail || 'Authentication failed');
             }
-
-            // data.access_token, data.user
             onLoginSuccess(data.user, data.access_token);
             toast.success(isLogin ? "Logged in successfully!" : "Registration successful!");
         } catch (error) {
             console.error('Auth Error:', error);
-            // Show specific error messages to user
             toast.error(error.message || "Something went wrong. Please try again.");
         } finally {
             setLoading(false);
@@ -102,8 +87,20 @@ const Auth = ({ onLoginSuccess, onBack }) => {
     };
 
     return (
-        <div className="auth-overlay">
-            <div className="auth-card glass-card animate-fade-in">
+        <motion.div
+            className="auth-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+        >
+            <motion.div
+                className="auth-card glass-card"
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
                 <button className="back-btn" onClick={onBack} title="Back to Home">
                     <X size={24} />
                 </button>
@@ -121,14 +118,7 @@ const Auth = ({ onLoginSuccess, onBack }) => {
                         <>
                             <div className="input-group">
                                 <User className="input-icon" size={18} />
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Full Name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                />
+                                <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
                             </div>
                             <div className="input-group">
                                 <Briefcase className="input-icon" size={18} />
@@ -144,14 +134,7 @@ const Auth = ({ onLoginSuccess, onBack }) => {
 
                     <div className="input-group">
                         <Mail className="input-icon" size={18} />
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email Address"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} required />
                     </div>
 
                     <div className="input-group password-group">
@@ -164,32 +147,33 @@ const Auth = ({ onLoginSuccess, onBack }) => {
                             onChange={handleChange}
                             required
                         />
-                        <button
-                            type="button"
-                            className="eye-btn"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
+                        <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
 
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                    <motion.button
+                        type="submit"
+                        className="auth-submit-btn"
+                        disabled={loading}
+                        whileHover={{ scale: 1.02, y: -1 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                    >
                         {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Complete Registration')}
                         {!loading && <ArrowRight size={18} />}
-                    </button>
+                    </motion.button>
                 </form>
 
-                <div className="auth-divider">
-                    <span>Or continue with</span>
-                </div>
+                <div className="auth-divider"><span>Or continue with</span></div>
 
                 <div className="social-auth">
-                    <button className="social-btn google" title="Continue with Google">
+                    <motion.button className="social-btn google" title="Continue with Google" whileHover={{ scale: 1.08, y: -2 }} whileTap={{ scale: 0.94 }}>
                         <Chrome size={20} />
-                    </button>
-                    <button className="social-btn facebook" title="Continue with Facebook">
+                    </motion.button>
+                    <motion.button className="social-btn facebook" title="Continue with Facebook" whileHover={{ scale: 1.08, y: -2 }} whileTap={{ scale: 0.94 }}>
                         <Facebook size={20} />
-                    </button>
+                    </motion.button>
                 </div>
 
                 <div className="auth-footer">
@@ -199,10 +183,9 @@ const Auth = ({ onLoginSuccess, onBack }) => {
                         <p>Already have an account? <span onClick={() => setIsLogin(true)}>Login</span></p>
                     )}
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
 
 export default Auth;
-
