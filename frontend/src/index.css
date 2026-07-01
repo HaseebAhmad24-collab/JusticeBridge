@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
+
 :root {
   /* Vibrant Law & Religious Palette */
   --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -22,6 +24,23 @@
   --header-height: 70px;
   --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --border-radius: 20px;
+
+  /* ── JusticeBridge "Mohar & Adalat" Palette ── */
+  --jb-ink:        #0D1117;   /* Deep siyahi background      */
+  --jb-smoke:      #1C2230;   /* Card / surface backgrounds  */
+  --jb-parchment:  #C4A35A;   /* Mughal mohar gold           */
+  --jb-parchment-dim: rgba(196, 163, 90, 0.12);
+  --jb-seal:       #8B1A2F;   /* Pakistan seal crimson       */
+  --jb-seal-dim:   rgba(139, 26, 47, 0.15);
+  --jb-jade:       #1A6B55;   /* Islamic jurisprudence green */
+  --jb-jade-dim:   rgba(26, 107, 85, 0.15);
+  --jb-mist:       #8A9BB5;   /* Quiet muted text            */
+  --jb-surface:    rgba(28, 34, 48, 0.8);
+  --jb-border:     rgba(196, 163, 90, 0.18);
+
+  /* JB Typography */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', 'Inter', sans-serif;
 }
 
 * {
