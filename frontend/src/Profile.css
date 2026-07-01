@@ -202,3 +202,163 @@
         padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
     }
 }
+
+/* ── Edit Profile Modal ─────────────────────────── */
+.edit-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.edit-modal {
+    width: 100%;
+    max-width: 440px;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative;
+}
+
+.edit-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.edit-modal-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.edit-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-modal-close:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+}
+
+.edit-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.edit-field input,
+.edit-field select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: #fff;
+    padding: 11px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+}
+
+.edit-field input:focus,
+.edit-field select:focus {
+    border-color: var(--legal-blue);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.edit-field select option {
+    background: #1e293b;
+    color: #fff;
+}
+
+.edit-modal-note {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 9px 12px;
+}
+
+.edit-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.edit-cancel-btn {
+    flex: 1;
+    padding: 11px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+}
+
+.edit-cancel-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.edit-save-btn {
+    flex: 2;
+    padding: 11px;
+    background: var(--legal-blue);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: opacity 0.2s;
+}
+
+.edit-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -1068,3 +1068,9 @@
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .analysis-grid-row {
+    grid-template-columns: 1fr !important;
+  }
+}

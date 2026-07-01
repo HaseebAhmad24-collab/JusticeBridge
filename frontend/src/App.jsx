@@ -33,7 +33,14 @@ import {
   UserPlus,
   Coins,
   Home as HomeIcon,
-  Download
+  Download,
+  Eye,
+  EyeOff,
+  Lock,
+  Paperclip,
+  Calendar,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-react';
 
 import Profile from './Profile';
@@ -56,7 +63,10 @@ document.head.appendChild(fontLink);
 const ChatInput = ({ onSend, loading, activeSessionId }) => {
   const [input, setInput] = useState(() => localStorage.getItem(`draft_${activeSessionId}`) || '');
   const [isListening, setIsListening] = useState(false);
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const recognitionRef = React.useRef(null);
+  const fileInputRef = React.useRef(null);
 
   // Sync with localStorage on change
   useEffect(() => {
@@ -68,6 +78,19 @@ const ChatInput = ({ onSend, loading, activeSessionId }) => {
     const saved = localStorage.getItem(`draft_${activeSessionId}`);
     setInput(saved || '');
   }, [activeSessionId]);
+
+  // Sync preview
+  useEffect(() => {
+    if (!file) {
+      setPreview(null);
+      return;
+    }
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file]);
 
   const handleVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window)) {
@@ -115,18 +138,87 @@ const ChatInput = ({ onSend, loading, activeSessionId }) => {
     recognition.start();
   };
 
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    if (!selected) return;
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(selected.type)) {
+      toast.error("Only PDF, JPG, and PNG files are supported.");
+      return;
+    }
+    if (selected.size > 10 * 1024 * 1024) {
+      toast.error("File exceeds 10MB limit.");
+      return;
+    }
+    setFile(selected);
+  };
+
+  const triggerFileSelect = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
   const handleSubmit = () => {
-    if (!input.trim() || loading) return;
-    onSend(input);
+    if (loading) return;
+    if (!input.trim() && !file) return;
+    onSend(input, null, file);
     setInput('');
+    setFile(null);
     localStorage.removeItem(`draft_${activeSessionId}`);
   };
 
   return (
-    <div className="chat-input-area">
+    <div className="chat-input-area" style={{ display: 'flex', flexDirection: 'column' }}>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".pdf,.jpg,.jpeg,.png"
+        style={{ display: 'none' }}
+      />
+      {file && (
+        <div className="file-preview-container" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '12px',
+          padding: '8px 12px',
+          marginBottom: '10px',
+          position: 'relative'
+        }}>
+          {preview ? (
+            <img src={preview} alt="Upload preview" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+          ) : (
+            <div style={{ background: 'var(--legal-blue)', color: '#fff', width: '40px', height: '40px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FileText size={20} />
+            </div>
+          )}
+          <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+            <div style={{ fontSize: '13px', color: '#fff', fontWeight: '600', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{file.name}</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFile(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
       <div className="input-wrapper">
         <textarea
-          placeholder="Ask me anything about law..."
+          placeholder="Ask about law or drop a case file..."
           rows="1"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -138,6 +230,18 @@ const ChatInput = ({ onSend, loading, activeSessionId }) => {
           }}
           disabled={loading}
         ></textarea>
+
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
+          className="mic-btn"
+          onClick={triggerFileSelect}
+          title="Upload PDF or Image"
+          disabled={loading}
+          style={{ marginRight: '5px' }}
+        >
+          <Paperclip size={20} />
+        </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.08 }}
@@ -155,7 +259,7 @@ const ChatInput = ({ onSend, loading, activeSessionId }) => {
           whileTap={{ scale: 0.92 }}
           className="send-btn"
           onClick={handleSubmit}
-          disabled={!input.trim() || loading}
+          disabled={(!input.trim() && !file) || loading}
         >
           {loading ? <Clock size={20} className="animate-spin" /> : <Send size={20} />}
         </motion.button>
@@ -208,6 +312,176 @@ const LegalLibrary = ({ topicKey }) => {
         </div>
       </div>
     </motion.div>
+  );
+};
+
+const VerifyEmailView = ({ token, onBackToLogin }) => {
+  const [status, setStatus] = useState('verifying');
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const verify = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/verify-email?token=${token}`, {
+          method: 'POST'
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setStatus('success');
+          setMessage(data.message || 'Your email has been verified successfully!');
+        } else {
+          setStatus('error');
+          setMessage(data.detail || 'Verification failed. The link may have expired or is invalid.');
+        }
+      } catch (error) {
+        setStatus('error');
+        setMessage('Could not connect to verification server.');
+      }
+    };
+    if (token) verify();
+  }, [token]);
+
+  return (
+    <div className="auth-card glass-card" style={{ maxWidth: '450px', padding: '40px', textAlign: 'center', margin: '0 auto' }}>
+      <div className="auth-logo" style={{ color: 'var(--legal-blue)', marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+        <Scale size={48} />
+      </div>
+      {status === 'verifying' && (
+        <>
+          <h2 style={{ color: '#fff', fontSize: '22px', marginBottom: '15px' }}>Verifying email...</h2>
+          <p style={{ color: '#cbd5e1', lineHeight: '1.6' }}>Please wait while we confirm your activation code.</p>
+        </>
+      )}
+      {status === 'success' && (
+        <>
+          <h2 style={{ color: 'var(--legal-blue)', fontSize: '22px', marginBottom: '15px' }}>Account Activated!</h2>
+          <p style={{ color: '#cbd5e1', lineHeight: '1.6', marginBottom: '25px' }}>{message}</p>
+          <button className="auth-submit-btn" onClick={onBackToLogin}>
+            Login Now
+          </button>
+        </>
+      )}
+      {status === 'error' && (
+        <>
+          <h2 style={{ color: '#f87171', fontSize: '22px', marginBottom: '15px' }}>Activation Failed</h2>
+          <p style={{ color: '#cbd5e1', lineHeight: '1.6', marginBottom: '25px' }}>{message}</p>
+          <button className="auth-submit-btn" onClick={onBackToLogin}>
+            Back to Home
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
+const ResetPasswordView = ({ token, onBackToLogin }) => {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState('form'); // 'form' | 'loading' | 'success' | 'error'
+  const [message, setMessage] = useState('');
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      setMessage('Password must be at least 6 characters.');
+      setStatus('error');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setMessage('Passwords do not match.');
+      setStatus('error');
+      return;
+    }
+    setStatus('loading');
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/reset-password?token=${token}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ new_password: newPassword }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setStatus('success');
+        setMessage(data.message || 'Password updated successfully!');
+      } else {
+        setStatus('error');
+        setMessage(data.detail || 'Failed to reset password.');
+      }
+    } catch {
+      setStatus('error');
+      setMessage('Could not connect to the server. Please try again.');
+    }
+  };
+
+  return (
+    <div className="auth-card glass-card" style={{ maxWidth: '450px', padding: '40px', textAlign: 'center', margin: '0 auto' }}>
+      <div className="auth-logo" style={{ color: 'var(--legal-blue)', marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+        <Scale size={48} />
+      </div>
+      {status === 'success' ? (
+        <>
+          <h2 style={{ color: 'var(--legal-blue)', fontSize: '22px', marginBottom: '15px' }}>Password Updated!</h2>
+          <p style={{ color: '#cbd5e1', lineHeight: '1.6', marginBottom: '25px' }}>{message}</p>
+          <button className="auth-submit-btn" onClick={onBackToLogin}>Login Now</button>
+        </>
+      ) : (
+        <>
+          <h2 style={{ color: '#fff', fontSize: '22px', marginBottom: '8px' }}>Reset Your Password</h2>
+          <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '22px', lineHeight: '1.6' }}>Enter a new password for your account.</p>
+          {status === 'error' && (
+            <p style={{ color: '#f87171', fontSize: '13px', marginBottom: '15px', background: 'rgba(239,68,68,0.1)', padding: '10px', borderRadius: '6px' }}>{message}</p>
+          )}
+          <form className="auth-form" onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
+            <div className="input-group password-group" style={{ marginBottom: '14px' }}>
+              <Lock className="input-icon" size={18} />
+              <input
+                type={showNew ? 'text' : 'password'}
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button type="button" className="eye-btn" onClick={() => setShowNew(!showNew)}>
+                {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <div className="input-group password-group">
+              <Lock className="input-icon" size={18} />
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => { setConfirmPassword(e.target.value); if (status === 'error') setStatus('form'); }}
+                required
+              />
+              <button type="button" className="eye-btn" onClick={() => setShowConfirm(!showConfirm)}>
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            <motion.button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={status === 'loading'}
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15 }}
+              style={{ marginTop: '20px', width: '100%' }}
+            >
+              {status === 'loading' ? 'Updating...' : 'Set New Password'}
+            </motion.button>
+          </form>
+          <p style={{ marginTop: '18px', color: '#94a3b8', fontSize: '13px', textAlign: 'center' }}>
+            Remembered it?{' '}
+            <span onClick={onBackToLogin} style={{ color: 'var(--legal-blue)', cursor: 'pointer' }}>Back to Login</span>
+          </p>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -268,6 +542,25 @@ function App() {
   };
   const [activeView, setActiveView] = useState(() => localStorage.getItem('activeView') || 'landing');
   const [showAuth, setShowAuth] = useState(false);
+  const [verifyToken, setVerifyToken] = useState(null);
+  const [resetToken, setResetToken] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenParam = params.get('token');
+    const path = window.location.pathname;
+
+    if (tokenParam && path.includes('/reset-password')) {
+      setResetToken(tokenParam);
+      setActiveView('reset-password');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (tokenParam && (path.includes('/verify-email') || path === '/')) {
+      setVerifyToken(tokenParam);
+      setActiveView('verify-email');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [currentUser, setCurrentUser] = useState(() => {
@@ -362,9 +655,93 @@ function App() {
     }
   };
 
-  const handleSend = async (text = null, editId = null) => {
+  const handleSend = async (text = null, editId = null, file = null) => {
     const isEdit = editId !== null;
     const textToSend = text;
+
+    if (file) {
+      // 1. Create a staged user message showing the uploaded file
+      const tempUserMsgId = Date.now();
+      const userMessage = {
+        id: tempUserMsgId,
+        type: 'user',
+        text: textToSend ? `[Uploaded file: ${file.name}]\n\n${textToSend}` : `[Uploaded file: ${file.name}]`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      let currentSessionId = activeSessionId;
+      if (!currentSessionId) {
+        currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        setActiveSessionId(currentSessionId);
+        const newConv = {
+          id: currentSessionId,
+          title: 'File Analysis: ' + file.name,
+          messages: [],
+          timestamp: Date.now()
+        };
+        setConversations(prev => [newConv, ...prev]);
+      }
+      
+      setMessages(prev => [...prev, userMessage], currentSessionId);
+      setLoading(true);
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (textToSend) {
+          formData.append('prompt', textToSend);
+        }
+        if (currentSessionId) {
+          formData.append('session_id', currentSessionId);
+        }
+        formData.append('title', 'Analysis: ' + file.name);
+        
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/documents/analyze`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ detail: 'Analysis failed' }));
+          throw new Error(errorData.detail || 'Failed to analyze document.');
+        }
+        
+        const data = await response.json();
+        
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'analysis',
+          summary: data.summary,
+          key_dates: data.key_dates,
+          strong_points: data.strong_points,
+          weak_points: data.weak_points,
+          relevant_sections: data.relevant_sections,
+          filename: data.filename,
+          text: data.text || '',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        
+        setMessages(prev => {
+          const filtered = prev.filter(m => m.id !== tempUserMsgId);
+          const syncedUserMsg = { ...userMessage, id: data.user_message_id || tempUserMsgId };
+          return [...filtered, syncedUserMsg, aiMessage];
+        }, currentSessionId);
+        
+        // Update session title to file name
+        setConversations(prev => prev.map(c => c.id === currentSessionId ? { ...c, title: 'Analysis: ' + file.name } : c));
+        
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error) || 'Analysis failed';
+        toast.error(errorMsg);
+        console.error('File Analysis Error:', error);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     if (!textToSend || !textToSend.trim() || loading) return;
 
@@ -646,6 +1023,36 @@ function App() {
   };
 
 
+
+  if (activeView === 'reset-password') {
+    return (
+      <div className="auth-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
+        <ResetPasswordView
+          token={resetToken}
+          onBackToLogin={() => {
+            setActiveView('landing');
+            setShowAuth(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (activeView === 'verify-email') {
+    return (
+      <div className="auth-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
+        <VerifyEmailView
+          token={verifyToken}
+          onBackToLogin={() => {
+            setActiveView('landing');
+            setShowAuth(true);
+          }}
+        />
+      </div>
+    );
+  }
 
   // If we are on landing page, show it without the app shell
   if (activeView === 'landing' && !showAuth) {
@@ -1003,6 +1410,114 @@ function App() {
                               <button onClick={() => setEditingId(null)} className="cancel-btn">Cancel</button>
                             </div>
                           </div>
+                        ) : msg.type === 'analysis' ? (
+                          <div className="analysis-result-container" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+                            <div className="analysis-header-card" style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              borderBottom: '1px solid var(--glass-border)',
+                              paddingBottom: '12px',
+                              marginBottom: '5px'
+                            }}>
+                              <FileText size={24} style={{ color: 'var(--legal-blue)' }} />
+                              <div>
+                                <h3 style={{ margin: 0, fontSize: '16px', color: '#fff' }}>Case Document Analysis</h3>
+                                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{msg.filename || 'Processed File'}</span>
+                              </div>
+                            </div>
+
+                            {/* Summary Card */}
+                            <div className="analysis-card-section glass-card" style={{ padding: '16px' }}>
+                              <h4 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--legal-blue)', fontSize: '14px' }}>
+                                <Info size={16} /> Document Summary
+                              </h4>
+                              <p style={{ margin: 0, fontSize: '13.5px', color: '#cbd5e1', lineHeight: '1.6' }}>{msg.summary}</p>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }} className="analysis-grid-row">
+                              {/* Strong Points */}
+                              <div className="analysis-card-section glass-card" style={{ padding: '16px' }}>
+                                <h4 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontSize: '14px' }}>
+                                  <ThumbsUp size={16} /> Strong Points
+                                </h4>
+                                {msg.strong_points && msg.strong_points.length > 0 ? (
+                                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>
+                                    {msg.strong_points.map((pt, idx) => <li key={idx} style={{ marginBottom: '6px' }}>{pt}</li>)}
+                                  </ul>
+                                ) : (
+                                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No strengths identified.</span>
+                                )}
+                              </div>
+
+                              {/* Weak Points */}
+                              <div className="analysis-card-section glass-card" style={{ padding: '16px' }}>
+                                <h4 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontSize: '14px' }}>
+                                  <ThumbsDown size={16} /> Risks &amp; Weaknesses
+                                </h4>
+                                {msg.weak_points && msg.weak_points.length > 0 ? (
+                                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: '#cbd5e1', lineHeight: '1.5' }}>
+                                    {msg.weak_points.map((pt, idx) => <li key={idx} style={{ marginBottom: '6px' }}>{pt}</li>)}
+                                  </ul>
+                                ) : (
+                                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No major risks flagged.</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Key Dates Card */}
+                            {msg.key_dates && msg.key_dates.length > 0 && (
+                              <div className="analysis-card-section glass-card" style={{ padding: '16px' }}>
+                                <h4 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--legal-blue)', fontSize: '14px' }}>
+                                  <Calendar size={16} /> Critical Dates
+                                </h4>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                  {msg.key_dates.map((dt, idx) => (
+                                    <div key={idx} style={{
+                                      background: 'rgba(255, 255, 255, 0.03)',
+                                      border: '1px solid var(--glass-border)',
+                                      borderRadius: '8px',
+                                      padding: '8px 12px',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      minWidth: '120px'
+                                    }}>
+                                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{dt.label}</span>
+                                      <span style={{ fontSize: '13px', color: '#fff', fontWeight: '600', marginTop: '3px' }}>{dt.date}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Relevant Legal Sections */}
+                            {msg.relevant_sections && msg.relevant_sections.length > 0 && (
+                              <div className="analysis-card-section glass-card" style={{ padding: '16px' }}>
+                                <h4 style={{ margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--legal-blue)', fontSize: '14px' }}>
+                                  <BookOpen size={16} /> Relevant Legal Sections
+                                </h4>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                  {msg.relevant_sections.map((sec, idx) => (
+                                    <span key={idx} style={{
+                                      background: 'rgba(16, 185, 129, 0.1)',
+                                      border: '1px solid rgba(16, 185, 129, 0.2)',
+                                      color: '#10b981',
+                                      borderRadius: '6px',
+                                      padding: '4px 10px',
+                                      fontSize: '12px',
+                                      fontWeight: '600'
+                                    }}>
+                                      {sec}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="message-meta" style={{ marginTop: '5px' }}>
+                              <span className="message-time">{msg.time}</span>
+                            </div>
+                          </div>
                         ) : (
                           <>
                             <div className="markdown-content">
@@ -1097,7 +1612,17 @@ function App() {
         ) : activeView === 'library' ? (
           <LegalLibrary topicKey={libraryTopic} />
         ) : activeView === 'profile' ? (
-          <Profile user={currentUser} conversations={conversations} onLogout={handleLogout} />
+          <Profile
+            user={currentUser}
+            conversations={conversations}
+            onLogout={handleLogout}
+            token={token}
+            onProfileUpdate={(updatedUser) => {
+              const merged = { ...currentUser, ...updatedUser };
+              setCurrentUser(merged);
+              localStorage.setItem('currentUser', JSON.stringify(merged));
+            }}
+          />
         ) : null}
       </main>
 
