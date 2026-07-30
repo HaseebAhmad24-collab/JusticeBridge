@@ -10,7 +10,6 @@ langchain-google-genai
 pypdf
 unstructured
 beautifulsoup4
-playwright
 python-jose[cryptography]
 passlib[recommended]
 python-multipart
