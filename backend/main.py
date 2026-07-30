@@ -311,7 +311,7 @@ def send_verification_email(email: str, name: str, token: str):
         return False
 
 @app.post("/register")
-async def register(user_in: UserCreate, db: Session = Depends(get_db)):
+async def register(user_in: UserCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user_in.email).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -333,8 +333,8 @@ async def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    # Send verification email
-    send_verification_email(new_user.email, new_user.name, token)
+    # Send verification email asynchronously in background
+    background_tasks.add_task(send_verification_email, new_user.email, new_user.name, token)
     
     return {
         "message": "Verification email sent. Please check your inbox and verify your account.",
@@ -457,7 +457,7 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
     return {"message": "Email verified successfully! You can now log in."}
 
 @app.post("/auth/resend-verification")
-async def resend_verification(request: ResendVerificationRequest, db: Session = Depends(get_db)):
+async def resend_verification(request: ResendVerificationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == request.email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
@@ -472,10 +472,7 @@ async def resend_verification(request: ResendVerificationRequest, db: Session = 
     user.token_expiry = expiry
     db.commit()
     
-    email_sent = send_verification_email(user.email, user.name, token)
-    if not email_sent:
-        raise HTTPException(status_code=500, detail="Failed to send verification email.")
-        
+    background_tasks.add_task(send_verification_email, user.email, user.name, token)
     return {"message": "Verification email resent successfully."}
 
 def send_reset_email(email: str, name: str, token: str):
