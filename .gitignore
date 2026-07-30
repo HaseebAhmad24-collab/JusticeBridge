@@ -1,9 +1,16 @@
 # Secret and Handover Files
-HANDOVER.md
 backend/.env
 frontend/.env
 *.db
 justicebridge.db
+
+# Markdown files (only README.md allowed on GitHub)
+*.md
+!README.md
+
+# Backup and temp files
+*.bak
+project_extraction.md
 
 # Dependencies
 node_modules/
