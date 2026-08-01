@@ -20,7 +20,7 @@
 [![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com/)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Live-22c55e?style=flat-square)](https://justice-bridge.vercel.app)
+[![Status](https://img.shields.io/badge/Status-Live-22c55e?style=flat-square)](https://justicebridge-nine.vercel.app/)
 
 <br/>
 
@@ -83,7 +83,7 @@ On top of the chat engine, the platform also lets users **upload their own case 
 
 | | |
 |---|---|
-| **Frontend (Vercel)** | [justice-bridge.vercel.app](https://justice-bridge.vercel.app) |
+| **Frontend (Vercel)** | [justice-bridge.vercel.app](https://justicebridge-nine.vercel.app/) |
 | **Backend (Render)** | FastAPI REST API, consumed by the frontend above |
 | **Repository** | [github.com/HaseebAhmad24-collab/JusticeBridge](https://github.com/HaseebAhmad24-collab/JusticeBridge) |
 
