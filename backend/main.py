@@ -35,6 +35,10 @@ try:
     SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
 except ValueError:
     SMTP_PORT = 465
+try:
+    SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
+except ValueError:
+    SMTP_TIMEOUT = 10
 
 if GENAI_API_KEY:
     genai.configure(api_key=GENAI_API_KEY)
@@ -296,12 +300,12 @@ def send_verification_email(email: str, name: str, token: str):
         # Send the message via SMTP server
         if SMTP_PORT == 465:
             # Use SSL
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
         else:
             # Use TLS
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
             server.starttls()
-            
+
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.sendmail(SMTP_USER, [email], msg.as_string())
         server.quit()
@@ -512,11 +516,11 @@ def send_reset_email(email: str, name: str, token: str):
         msg.attach(part)
         
         if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
         else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
             server.starttls()
-            
+
         server.login(SMTP_USER, SMTP_PASSWORD)
         server.sendmail(SMTP_USER, [email], msg.as_string())
         server.quit()
