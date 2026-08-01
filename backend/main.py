@@ -17,6 +17,7 @@ import google.generativeai as genai
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from dotenv import load_dotenv
+import resend
 
 load_dotenv()
 
@@ -28,17 +29,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 1 week
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
-SMTP_USER = os.getenv("SMTP_USER")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-try:
-    SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
-except ValueError:
-    SMTP_PORT = 465
-try:
-    SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "10"))
-except ValueError:
-    SMTP_TIMEOUT = 10
+# Transactional email (Resend) — sent over HTTPS, so it works the same
+# locally and on hosts (e.g. Render) that block outbound raw SMTP.
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+EMAIL_FROM = os.getenv("EMAIL_FROM", "JusticeBridge AI <onboarding@resend.dev>")
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
 
 if GENAI_API_KEY:
     genai.configure(api_key=GENAI_API_KEY)
@@ -261,14 +257,10 @@ app.add_middleware(
 )
 
 def send_verification_email(email: str, name: str, token: str):
-    if not SMTP_USER or not SMTP_PASSWORD:
-        print("Warning: SMTP credentials not configured, cannot send verification email.")
+    if not RESEND_API_KEY:
+        print("Warning: RESEND_API_KEY not configured, cannot send verification email.")
         return False
     try:
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-
         html_content = f"""
         <html>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 20px;">
@@ -286,32 +278,16 @@ def send_verification_email(email: str, name: str, token: str):
         </body>
         </html>
         """
-        
-        # Create message container
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Verify your JusticeBridge account"
-        msg['From'] = f"JusticeBridge AI <{SMTP_USER}>"
-        msg['To'] = email
-        
-        # Record the MIME type of HTML.
-        part = MIMEText(html_content, 'html')
-        msg.attach(part)
-        
-        # Send the message via SMTP server
-        if SMTP_PORT == 465:
-            # Use SSL
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
-        else:
-            # Use TLS
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
-            server.starttls()
 
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(SMTP_USER, [email], msg.as_string())
-        server.quit()
+        resend.Emails.send({
+            "from": EMAIL_FROM,
+            "to": [email],
+            "subject": "Verify your JusticeBridge account",
+            "html": html_content
+        })
         return True
     except Exception as e:
-        print(f"Failed to send email via SMTP: {e}")
+        print(f"Failed to send email via Resend: {e}")
         return False
 
 @app.post("/register")
@@ -480,14 +456,10 @@ async def resend_verification(request: ResendVerificationRequest, background_tas
     return {"message": "Verification email resent successfully."}
 
 def send_reset_email(email: str, name: str, token: str):
-    if not SMTP_USER or not SMTP_PASSWORD:
-        print("Warning: SMTP credentials not configured, cannot send reset email.")
+    if not RESEND_API_KEY:
+        print("Warning: RESEND_API_KEY not configured, cannot send reset email.")
         return False
     try:
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-
         html_content = f"""
         <html>
         <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 20px;">
@@ -506,27 +478,16 @@ def send_reset_email(email: str, name: str, token: str):
         </body>
         </html>
         """
-        
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Reset your JusticeBridge password"
-        msg['From'] = f"JusticeBridge AI <{SMTP_USER}>"
-        msg['To'] = email
-        
-        part = MIMEText(html_content, 'html')
-        msg.attach(part)
-        
-        if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
-        else:
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=SMTP_TIMEOUT)
-            server.starttls()
 
-        server.login(SMTP_USER, SMTP_PASSWORD)
-        server.sendmail(SMTP_USER, [email], msg.as_string())
-        server.quit()
+        resend.Emails.send({
+            "from": EMAIL_FROM,
+            "to": [email],
+            "subject": "Reset your JusticeBridge password",
+            "html": html_content
+        })
         return True
     except Exception as e:
-        print(f"Failed to send reset email via SMTP: {e}")
+        print(f"Failed to send reset email via Resend: {e}")
         return False
 
 @app.post("/auth/forgot-password")
