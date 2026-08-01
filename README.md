@@ -32,6 +32,11 @@
 
 ## 📋 Table of Contents
 
+<table>
+<tr>
+<td valign="top" width="50%">
+
+**🔎 Understand the Project**
 - [Overview](#-overview)
 - [Live Demo](#-live-demo)
 - [Features](#-features)
@@ -39,6 +44,11 @@
 - [User Flow](#-user-flow)
 - [How the RAG Pipeline Works](#-how-the-rag-pipeline-works)
 - [Tech Stack](#-tech-stack)
+
+</td>
+<td valign="top" width="50%">
+
+**⚙️ Build, Run & Ship It**
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
@@ -48,6 +58,10 @@
 - [Roadmap](#-roadmap)
 - [About This Project](#-about-this-project)
 - [License](#-license)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -460,6 +474,6 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 Built with ❤️ to make legal knowledge accessible to every Pakistani.
 
-**[⬆ Back to Top](#️-justicebridge-ai)**
+**[⬆ Back to Top](#-justicebridge-ai)**
 
 </div>
